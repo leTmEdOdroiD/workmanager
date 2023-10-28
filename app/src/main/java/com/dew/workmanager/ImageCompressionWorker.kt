@@ -31,16 +31,15 @@ class ImageCompressionWorker(private val appContext: Context, private val param:
             var quality = 100
             do {
                 val outputStream = ByteArrayOutputStream()
-                outputStream.use { outputStream ->
-                    bitmap.compress(Bitmap.CompressFormat.PNG, quality, outputStream)
-                    outputByteArray = outputStream.toByteArray()
+                outputStream.use {
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, quality, it)
+                    outputByteArray = it.toByteArray()
                     quality -= (quality * 0.1).roundToInt()
                 }
-            } while (outputByteArray.size > 1024 * 10 && quality > 5)
+            } while (outputByteArray.size > (1024 * 20L) && quality > 5)
 
-            val file = File(appContext.cacheDir, "${param.id}.png")
+            val file = File(appContext.cacheDir, "${param.id}.jpg")
             file.writeBytes(outputByteArray)
-
             return@withContext Result.success(
                 workDataOf(
                     KEY_OUTPUT_IMG_URL to file.absolutePath
